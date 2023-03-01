@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>SocketsChat</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+
+      <div class="col-md-9">
+        <h3>Chat publico</h3>
+        <div id="chat" class="panel panel-default">
+          <div class="panel-body">
+            <ul id="message_list">
+              
+            </ul>
+          </div>
+          <div class="panel-footer">
+            <form id="message_area" action="">
+              <div class="input-group">
+                <input id="text_area" type="text" class="form-control" autocomplete="off" />
+                <span class="input-group-btn">
+                  <button class="btn btn-default" type="submit">Enviar</button>
+                </span>
+                <span class="input-group-btn">
+                  <input id="file_input" type="file" style="display:none;" />
+                  <button id="file_button" class="btn btn-default" type="button">Adjuntar archivo</button>
+                </span>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <h3>Chat privado</h3>
+        <div id="chat-private" class="panel panel-default">
+          <div class="panel-body">
+            <ul id="message_list_private">
+              
+            </ul>
+          </div>
+          <div class="panel-footer">
+            <form id="message_area_private" action="">
+              <div class="input-group">
+                <input id="text_area_private" type="text" class="form-control" autocomplete="off" />
+                <span class="input-group-btn">
+                  <button class="btn btn-default" type="submit">Enviar</button>
+                </span>
+                <span class="input-group-btn">
+                  <input id="file_input_private" type="file" style="display:none;" />
+                  <button id="file_button_private" class="btn btn-default" type="button">Adjuntar archivo</button>
+                </span>
+                <span class="input-group-btn">
+                  <button onclick="chatOne()" class="btn btn-default" type="submit">Con quién desea hablar</button>
+                </span>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const socket = io();
+
+    let username = '';
+    while (!username) {
+      username = window.prompt("Usuario:");
+    }
+
+    socket.on('connect',()=>{
+      socket.emit('new user', username);
+    })
+    
+
+    const messageForm = document.getElementById('message_area');
+    const textInput = document.getElementById('text_area');
+
+    const messageFormPrivate = document.getElementById('message_area_private') 
+    const textInputPrivate = document.getElementById('text_area_private')
+    let recipientUsername = '';
+
+    messageForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (textInput.value) {
+        socket.emit('new message', textInput.value);
+        textInput.value = '';
+      }
+    });
+
+    messageFormPrivate.addEventListener('submit',function(e){
+      e.preventDefault();
+      if (textInputPrivate.value) {
+        socket.emit('private message', {
+          recipient: recipientUsername,
+          message: textInputPrivate.value
+        });
+        appendMessageToChat({
+          sender: 'Tú',
+          message: textInputPrivate.value
+        });
+        textInputPrivate.value = '';
+      }
+    })
+
+    function appendMessageToChat({ sender, message }) {
+      const messageList = document.getElementById('message_list_private');
+      const chatItem = document.createElement('li');
+      chatItem.innerHTML = `
+        <div class="chat-message">
+          <p><strong>${sender}: </strong>${message}</p>
+        </div>
+      `;
+      messageList.appendChild(chatItem);
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function chatOne(){
+        recipientUsername = window.prompt("Ingresa el nombre de usuario con quien deseas chatear:");
+    }
+
+    socket.on('private message', ({ message, sender }) => {
+      if (sender === recipientUsername) {
+        appendMessageToChat({
+          sender: sender,
+          message: message
+        });
+      }
+    });
+   
+    socket.on('send message', (data) => {
+      const messageList = document.getElementById('message_list');
+      const chatItem = document.createElement('li');
+      chatItem.innerHTML = `
+        <div class="chat-message">
+          <p><strong>${data.user}: </strong>${data.message}</p>
+        </div>
+      `;
+      messageList.appendChild(chatItem);
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+
+    socket.on('username taken', () => {
+      username = '';
+      while (!username) {
+        username = window.prompt("El nombre de usuario ya está en uso, por favor ingrese otro:");
+      }
+      socket.emit('new user', username);
+    });
+
+    const fileButton = document.getElementById('file_button');
+    const fileInput = document.getElementById('file_input');
+
+    fileButton.addEventListener('click', function() {
+      fileInput.click();
+    });
+    
+    fileInput.addEventListener('change', function() {
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function() {
+      socket.emit('new file', {
+        file: reader.result,
+        filename: file.name,
+        filetype: file.type
+      });
+    };
+  });
+
+  socket.on('file received', (data) => {
+  const messageList = document.getElementById('message_list');
+  const chatItem = document.createElement('li');
+  chatItem.innerHTML = `
+    <div class="chat-message">
+      <p><strong>${data.sender}: </strong>ha enviado un archivo: <a href="${data.file}" download="${data.filename}">${data.filename}</a></p>
+    </div>
+  `;
+  messageList.appendChild(chatItem);
+  window.scrollTo(0, document.body.scrollHeight);
+  });
+
+  </script>
+
+</body>
+
+</html>
