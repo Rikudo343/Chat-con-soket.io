@@ -1,7 +1,7 @@
 const application = require('express')();
 const server = require('http').createServer(application)
 const io = require('socket.io')(server);
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 8080
 
 const users = {};
 
@@ -9,7 +9,7 @@ const users = {};
     res.sendFile(__dirname + '/index.html');
   });
 
-  server.listen(PORT, () => {
+  server.listen(PORT,"192.168.89.246", () => {
     console.log('Servidor ejecutando en puerto: ' + PORT);
   });
 

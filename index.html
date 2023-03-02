@@ -2,13 +2,17 @@
 <html>
 
 <head>
+  <meta charset="utf-8">
   <title>SocketsChat</title>
   <script src="/socket.io/socket.io.js"></script>
+  <link href="/style.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <link rel="stylesheet" href="style.css">
-</head>
 
-<body>
+
+  
+</head>
+<h1>chats</h1>
+<body id="back" class="back">
   <div class="container">
     <div class="row">
 
@@ -20,7 +24,7 @@
               
             </ul>
           </div>
-          <div class="panel-footer">
+          <div class="panel-footer1">
             <form id="message_area" action="">
               <div class="input-group">
                 <input id="text_area" type="text" class="form-control" autocomplete="off" />
@@ -43,7 +47,7 @@
               
             </ul>
           </div>
-          <div class="panel-footer">
+          <div class="panel-footer2">
             <form id="message_area_private" action="">
               <div class="input-group">
                 <input id="text_area_private" type="text" class="form-control" autocomplete="off" />
@@ -187,5 +191,59 @@ window.scrollTo(0, document.body.scrollHeight);
   </script>
 
 </body>
+<style>
+  
+.back {
+    background-color: #3c8157;
+  }
+  
+  .navbar {
+    margin-bottom: 0;
+  }
+  
+  #chat {
+    max-width: 500px;
+    margin: 20px auto;
+  }
+  
+  #message_list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .chat-item {
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  
+  .chat-message {
+    overflow: hidden;
+  }
+  
+  .chat-message p {
+    margin: 0;
+  }
+  
+  .chat-right .chat-message {
+    text-align: right;
+  }
+  
+  .chat-right .chat-message p {
+    background-color: #16210f;
+    display: inline-block;
+    border-radius: 15px;
+    padding: 5px 10px;
+  }
+  
+  .chat-left .chat-message p {
+    background-color: #725252;
+    display: inline-block;
+    border-radius: 15px;
+    padding: 5px 10px;
+    border: 1px solid #b75353;
+  }
+  
+</style>
 
 </html>

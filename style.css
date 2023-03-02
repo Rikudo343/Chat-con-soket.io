@@ -1,4 +1,5 @@
-body {
+
+.back {
     background-color: #181616;
   }
   
@@ -42,10 +43,10 @@ body {
   }
   
   .chat-left .chat-message p {
-    background-color: #fff;
+    background-color: #725252;
     display: inline-block;
     border-radius: 15px;
     padding: 5px 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #b75353;
   }
   
